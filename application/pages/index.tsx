@@ -1,21 +1,24 @@
 import {
   Web3Button,
+  useAddress,
   useContract,
   useContractRead,
   useContractWrite,
+  useUser,
 } from "@thirdweb-dev/react";
 import type { NextPage } from "next";
-import { greeter } from "../const/contracts";
+import { nft } from "../const/contracts";
+import { useState } from "react";
 
 const Home: NextPage = () => {
-  const { contract } = useContract(greeter);
+  const { contract } = useContract(nft);
 
-  const { data, isLoading, error } = useContractRead(contract, "greet");
+  const [s, setS] = useState("new value");
 
-  const { mutateAsync: setGreeting } = useContractWrite(
-    contract,
-    "setGreeting"
-  );
+  // const { data, isLoading, error } = useContractRead(contract, "mint");
+
+  const { mutateAsync: mint } = useContractWrite(contract, "mint");
+  const address = useAddress();
 
   return (
     <div className="w-full mx-auto pr-8 pl-8 max-w-7xl relative pb-10 mt-32">
@@ -23,13 +26,15 @@ const Home: NextPage = () => {
         Hello world
       </h1>
 
-      <p>{isLoading ? "Loading..." : data}</p>
+      <input value={s} onChange={(e) => setS(e.target.value)} />
+
+      {/* <p>{isLoading ? "Loading..." : data}</p> */}
 
       <Web3Button
-        contractAddress={greeter}
+        contractAddress={nft}
         action={() =>
-          setGreeting({
-            args: ["new value"],
+          mint({
+            args: [address],
           })
         }
       >
